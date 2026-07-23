@@ -22,6 +22,20 @@ const maulfinity = {
     toggle: (id: string) => ipcRenderer.invoke('trigger:toggle', id)
   },
 
+  // Automation operations
+  automation: {
+    list: (profileId: string) => ipcRenderer.invoke('automation:list', profileId),
+    get: (id: string) => ipcRenderer.invoke('automation:get', id),
+    create: (data: unknown) => ipcRenderer.invoke('automation:create', data),
+    update: (id: string, data: unknown) => ipcRenderer.invoke('automation:update', id, data),
+    delete: (id: string) => ipcRenderer.invoke('automation:delete', id),
+    toggle: (id: string) => ipcRenderer.invoke('automation:toggle', id),
+    test: (id: string, testEvent?: unknown) => ipcRenderer.invoke('automation:test', id, testEvent),
+    execute: (id: string, eventData: unknown) => ipcRenderer.invoke('automation:execute', id, eventData),
+    getHistory: (automationId?: string, limit?: number) => ipcRenderer.invoke('automation:getHistory', automationId, limit),
+    getStats: () => ipcRenderer.invoke('automation:getStats')
+  },
+
   // Asset operations
   asset: {
     list: () => ipcRenderer.invoke('asset:list'),

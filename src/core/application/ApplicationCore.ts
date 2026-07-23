@@ -6,6 +6,7 @@ import { ModuleManager } from '@core/module-manager/ModuleManager'
 import { ConfigManager } from '@core/config-manager/ConfigManager'
 import { TriggerEngine } from '@core/trigger-engine/TriggerEngine'
 import { ActionEngine } from '@core/action-engine/ActionEngine'
+import { AutomationEngine } from '@core/automation/AutomationEngine'
 import { ConnectorManager } from '@connectors/core/ConnectorManager'
 import { registerConnectors } from '@connectors/core/registerConnectors'
 
@@ -23,6 +24,7 @@ export class ApplicationCore {
   private configManager!: ConfigManager
   private triggerEngine!: TriggerEngine
   private actionEngine!: ActionEngine
+  private automationEngine!: AutomationEngine
   private connectorManager!: ConnectorManager
 
   private constructor() {
@@ -85,10 +87,12 @@ export class ApplicationCore {
       // Step 5: Initialize engines
       this.actionEngine = ActionEngine.getInstance()
       this.triggerEngine = new TriggerEngine()
+      this.automationEngine = AutomationEngine.getInstance()
       this.connectorManager = ConnectorManager.getInstance()
 
       this.serviceContainer.registerInstance('triggerEngine', this.triggerEngine)
       this.serviceContainer.registerInstance('actionEngine', this.actionEngine)
+      this.serviceContainer.registerInstance('automationEngine', this.automationEngine)
       this.serviceContainer.registerInstance('connectorManager', this.connectorManager)
 
       this.logger.info('Core engines initialized')
@@ -98,6 +102,10 @@ export class ApplicationCore {
 
       // Step 5.6: Load triggers into TriggerEngine
       await this.loadTriggersIntoEngine()
+
+      // Step 5.7: Initialize AutomationEngine
+      this.automationEngine.initialize()
+      await this.loadAutomationsIntoEngine()
 
       // Step 6: Initialize all registered services
       await this.serviceContainer.initializeAll()
@@ -140,13 +148,19 @@ export class ApplicationCore {
       await this.moduleManager.destroyAll()
       this.logger.info('All modules destroyed')
 
-      // Step 3: Disconnect all connectors
+      // Step 3.5: Shutdown automation engine
+      if (this.automationEngine) {
+        this.automationEngine.shutdown()
+        this.logger.info('Automation engine shutdown')
+      }
+
+      // Step 4: Disconnect all connectors
       if (this.connectorManager) {
         await this.connectorManager.disconnectAll()
         this.logger.info('All connectors disconnected')
       }
 
-      // Step 4: Clear event bus
+      // Step 5: Clear event bus
       this.eventBus.clear()
       this.logger.info('Event bus cleared')
 
@@ -202,6 +216,38 @@ export class ApplicationCore {
   }
 
   /**
+   * Load automations from database into AutomationEngine
+   */
+  private async loadAutomationsIntoEngine(): Promise<void> {
+    try {
+      const { AutomationRepository } = await import('@services/database/repositories/AutomationRepository')
+      const automationRepo = new AutomationRepository()
+      const rows = automationRepo.findAll()
+
+      const automations = rows.map(row => ({
+        id: row.id,
+        profileId: row.profile_id,
+        name: row.name,
+        description: row.description || undefined,
+        type: row.type as 'simple' | 'advanced',
+        enabled: row.enabled === 1,
+        eventType: row.event_type,
+        conditions: JSON.parse(row.conditions_json || '[]'),
+        actions: JSON.parse(row.actions_json || '[]'),
+        cooldown: row.cooldown || undefined,
+        maxExecutions: row.max_executions || undefined,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at
+      }))
+
+      this.automationEngine.loadAutomations(automations)
+      this.logger.info(`Loaded ${automations.length} automations into AutomationEngine`)
+    } catch (error) {
+      this.logger.error('Failed to load automations', error as Error)
+    }
+  }
+
+  /**
    * Check if the application is running
    */
   isRunning(): boolean {
@@ -248,6 +294,13 @@ export class ApplicationCore {
    */
   getActionEngine(): ActionEngine {
     return this.actionEngine
+  }
+
+  /**
+   * Get the automation engine instance
+   */
+  getAutomationEngine(): AutomationEngine {
+    return this.automationEngine
   }
 
   /**

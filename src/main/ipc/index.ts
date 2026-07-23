@@ -1,12 +1,15 @@
 import { ipcMain } from 'electron'
 import { profileHandlers } from './profile.ipc'
 import { triggerHandlers } from './trigger.ipc'
+import { automationHandlers } from './automation.ipc'
 import { assetHandlers } from './asset.ipc'
 import { connectorHandlers } from './connector.ipc'
 import { overlayHandlers } from './overlay.ipc'
 import { pluginHandlers } from './plugin.ipc'
 import { systemHandlers } from './system.ipc'
 import { settingsHandlers } from './settings.ipc'
+import { obsHandlers } from './obs.ipc'
+import { overlayRuntimeHandlers } from './overlay-runtime.ipc'
 
 export function registerIpcHandlers(): void {
   // Profile handlers
@@ -23,6 +26,18 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('trigger:delete', triggerHandlers.delete)
   ipcMain.handle('trigger:test', triggerHandlers.test)
   ipcMain.handle('trigger:toggle', triggerHandlers.toggle)
+
+  // Automation handlers
+  ipcMain.handle('automation:list', automationHandlers.list)
+  ipcMain.handle('automation:get', automationHandlers.get)
+  ipcMain.handle('automation:create', automationHandlers.create)
+  ipcMain.handle('automation:update', automationHandlers.update)
+  ipcMain.handle('automation:delete', automationHandlers.delete)
+  ipcMain.handle('automation:toggle', automationHandlers.toggle)
+  ipcMain.handle('automation:test', automationHandlers.test)
+  ipcMain.handle('automation:execute', automationHandlers.execute)
+  ipcMain.handle('automation:getHistory', automationHandlers.getHistory)
+  ipcMain.handle('automation:getStats', automationHandlers.getStats)
 
   // Asset handlers
   ipcMain.handle('asset:list', assetHandlers.list)
@@ -58,4 +73,31 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('settings:get', settingsHandlers.get)
   ipcMain.handle('settings:set', settingsHandlers.set)
   ipcMain.handle('settings:getAll', settingsHandlers.getAll)
+
+  // OBS handlers
+  ipcMain.handle('obs:connect', obsHandlers.connect)
+  ipcMain.handle('obs:disconnect', obsHandlers.disconnect)
+  ipcMain.handle('obs:status', obsHandlers.status)
+  ipcMain.handle('obs:getScenes', obsHandlers.getScenes)
+  ipcMain.handle('obs:switchScene', obsHandlers.switchScene)
+  ipcMain.handle('obs:getSources', obsHandlers.getSources)
+  ipcMain.handle('obs:setSourceVisibility', obsHandlers.setSourceVisibility)
+  ipcMain.handle('obs:startRecording', obsHandlers.startRecording)
+  ipcMain.handle('obs:stopRecording', obsHandlers.stopRecording)
+  ipcMain.handle('obs:toggleRecording', obsHandlers.toggleRecording)
+  ipcMain.handle('obs:startStreaming', obsHandlers.startStreaming)
+  ipcMain.handle('obs:stopStreaming', obsHandlers.stopStreaming)
+  ipcMain.handle('obs:toggleStreaming', obsHandlers.toggleStreaming)
+  ipcMain.handle('obs:getStats', obsHandlers.getStats)
+
+  // Overlay Runtime handlers
+  ipcMain.handle('overlayRuntime:getCurrentScene', overlayRuntimeHandlers.getCurrentScene)
+  ipcMain.handle('overlayRuntime:setCurrentScene', overlayRuntimeHandlers.setCurrentScene)
+  ipcMain.handle('overlayRuntime:reloadScene', overlayRuntimeHandlers.reloadScene)
+  ipcMain.handle('overlayRuntime:getObjects', overlayRuntimeHandlers.getObjects)
+  ipcMain.handle('overlayRuntime:setObjectVisibility', overlayRuntimeHandlers.setObjectVisibility)
+  ipcMain.handle('overlayRuntime:startAnimation', overlayRuntimeHandlers.startAnimation)
+  ipcMain.handle('overlayRuntime:stopAnimation', overlayRuntimeHandlers.stopAnimation)
+  ipcMain.handle('overlayRuntime:startRendering', overlayRuntimeHandlers.startRendering)
+  ipcMain.handle('overlayRuntime:stopRendering', overlayRuntimeHandlers.stopRendering)
 }

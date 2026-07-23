@@ -1,5 +1,6 @@
 import Database from 'better-sqlite3'
 import { migration001 } from './001_initial'
+import { migration002 } from './002_automations'
 
 export function runMigrations(db: Database.Database): void {
   // Create migrations table if it doesn't exist
@@ -17,7 +18,8 @@ export function runMigrations(db: Database.Database): void {
 
   // Run pending migrations
   const migrations = [
-    { name: '001_initial', fn: migration001 }
+    { name: '001_initial', fn: migration001 },
+    { name: '002_automations', fn: migration002 }
   ]
 
   for (const migration of migrations) {
