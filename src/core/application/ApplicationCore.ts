@@ -9,6 +9,11 @@ import { ActionEngine } from '@core/action-engine/ActionEngine'
 import { AutomationEngine } from '@core/automation/AutomationEngine'
 import { ConnectorManager } from '@connectors/core/ConnectorManager'
 import { registerConnectors } from '@connectors/core/registerConnectors'
+import { GameManager } from '@game/GameManager'
+import { GTAAdapter } from '@game/adapters/GTAAdapter'
+import { RobloxAdapter } from '@game/adapters/RobloxAdapter'
+import { CustomAdapter } from '@game/adapters/CustomAdapter'
+import { PluginManager } from '@plugins/PluginManager'
 
 export type ApplicationStatus = 'idle' | 'starting' | 'running' | 'stopping' | 'stopped' | 'error'
 
@@ -26,6 +31,8 @@ export class ApplicationCore {
   private actionEngine!: ActionEngine
   private automationEngine!: AutomationEngine
   private connectorManager!: ConnectorManager
+  private gameManager!: GameManager
+  private pluginManager!: PluginManager
 
   private constructor() {
     this.logger = new Logger('ApplicationCore')
@@ -100,15 +107,38 @@ export class ApplicationCore {
       // Step 5.5: Register built-in connectors (TikTok, YouTube)
       registerConnectors()
 
-      // Step 5.6: Load triggers into TriggerEngine
+      // Step 5.6: Initialize Game Integration Layer
+      this.gameManager = GameManager.getInstance()
+      this.gameManager.registerAdapterFactory('GTAAdapter', GTAAdapter)
+      this.gameManager.registerAdapterFactory('RobloxAdapter', RobloxAdapter)
+      this.gameManager.registerAdapterFactory('CustomAdapter', CustomAdapter)
+      this.serviceContainer.registerInstance('gameManager', this.gameManager)
+      this.logger.info('Game Integration Layer initialized')
+
+      // Step 5.7: Initialize Plugin System
+      this.pluginManager = PluginManager.getInstance()
+      await this.pluginManager.initialize()
+      this.serviceContainer.registerInstance('pluginManager', this.pluginManager)
+      this.logger.info('Plugin System initialized')
+
+      // Step 5.8: Load triggers into TriggerEngine
       await this.loadTriggersIntoEngine()
 
-      // Step 5.7: Initialize AutomationEngine
+      // Step 5.9: Initialize AutomationEngine
       this.automationEngine.initialize()
       await this.loadAutomationsIntoEngine()
 
+      // Step 5.10: Load games from database
+      await this.loadGamesIntoManager()
+
+      // Step 5.11: Load plugins from database
+      await this.pluginManager.loadFromDatabase()
+
       // Step 6: Initialize all registered services
       await this.serviceContainer.initializeAll()
+
+      // Step 6.1: Auto-connect enabled games
+      await this.autoConnectGames()
 
       this.status = 'running'
 
@@ -148,7 +178,13 @@ export class ApplicationCore {
       await this.moduleManager.destroyAll()
       this.logger.info('All modules destroyed')
 
-      // Step 3.5: Shutdown automation engine
+      // Step 3.5: Shutdown plugin system
+      if (this.pluginManager) {
+        await this.pluginManager.shutdown()
+        this.logger.info('Plugin system shutdown')
+      }
+
+      // Step 3.6: Shutdown automation engine
       if (this.automationEngine) {
         this.automationEngine.shutdown()
         this.logger.info('Automation engine shutdown')
@@ -308,5 +344,62 @@ export class ApplicationCore {
    */
   getConnectorManager(): ConnectorManager {
     return this.connectorManager
+  }
+
+  /**
+   * Get the game manager instance
+   */
+  getGameManager(): GameManager {
+    return this.gameManager
+  }
+
+  /**
+   * Load games from database into GameManager
+   */
+  private async loadGamesIntoManager(): Promise<void> {
+    try {
+      const { GameRepository } = await import('@services/database/repositories/GameRepository')
+      const gameRepo = new GameRepository()
+      const rows = gameRepo.findAll()
+
+      const games = rows.map(row => ({
+        id: row.id,
+        name: row.name,
+        version: row.version,
+        description: row.description || '',
+        adapter: row.adapter,
+        adapterVersion: row.adapter_version,
+        status: row.status as import('@game/types').GameStatus,
+        config: JSON.parse(row.settings_json || '{}'),
+        installedAt: row.installed_at,
+        lastUsed: row.last_used_at || undefined
+      }))
+
+      this.gameManager.loadGames(games)
+      this.logger.info(`Loaded ${games.length} games into GameManager`)
+    } catch (error) {
+      this.logger.error('Failed to load games', error as Error)
+    }
+  }
+
+  /**
+   * Auto-connect enabled games
+   */
+  private async autoConnectGames(): Promise<void> {
+    try {
+      const games = this.gameManager.getRegistry().getAllGames()
+      const autoConnectGames = games.filter(g => g.config.autoConnect && g.status !== 'disabled')
+
+      for (const game of autoConnectGames) {
+        try {
+          await this.gameManager.connectGame(game.id)
+          this.logger.info(`Auto-connected to game: ${game.name}`)
+        } catch (error) {
+          this.logger.warning(`Failed to auto-connect to game: ${game.name}`)
+        }
+      }
+    } catch (error) {
+      this.logger.error('Failed to auto-connect games', error as Error)
+    }
   }
 }

@@ -21,7 +21,9 @@
       "@shared/*": ["./src/shared/*"],
       "@core/*": ["./src/core/*"],
       "@services/*": ["./src/services/*"],
-      "@connectors/*": ["./src/connectors/*"]
+      "@connectors/*": ["./src/connectors/*"],
+      "@game/*": ["./src/game/*"],
+      "@plugins/*": ["./src/plugins/*"]
     }
   },
   "include": [
@@ -30,7 +32,9 @@
     "src/core/**/*.ts",
     "src/services/**/*.ts",
     "src/shared/**/*.ts",
-    "src/connectors/**/*.ts"
+    "src/connectors/**/*.ts",
+    "src/game/**/*.ts",
+    "src/plugins/**/*.ts"
   ],
   "exclude": ["node_modules", "dist", "out"]
 }

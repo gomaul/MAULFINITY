@@ -11,7 +11,10 @@ export default defineConfig({
         '@shared': resolve('src/shared'),
         '@core': resolve('src/core'),
         '@services': resolve('src/services'),
-        '@connectors': resolve('src/connectors')
+        '@connectors': resolve('src/connectors'),
+        '@game': resolve('src/game'),
+        '@plugins': resolve('src/plugins'),
+        '@automation': resolve('src/automation')
       }
     }
   },
@@ -29,7 +32,9 @@ export default defineConfig({
     resolve: {
       alias: {
         '@shared': resolve('src/shared'),
-        '@renderer': resolve('src/renderer')
+        '@renderer': resolve('src/renderer'),
+        '@game': resolve('src/game'),
+        '@automation': resolve('src/automation')
       }
     }
   }

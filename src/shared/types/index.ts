@@ -70,3 +70,43 @@ export interface PlatformStatus {
   status: ConnectionStatus
   lastConnected?: string
 }
+
+// Game Integration types
+export interface GameRegistration {
+  id: string
+  name: string
+  version: string
+  description: string
+  adapter: string
+  adapterVersion: string
+  status: GameStatus
+  config: GameAdapterConfig
+  installedAt: string
+  lastUsed?: string
+}
+
+export type GameStatus = 'installed' | 'configured' | 'connected' | 'error' | 'disabled'
+
+export type GameAdapterState = 'disconnected' | 'connecting' | 'connected' | 'error' | 'disabled'
+
+export interface GameAdapterConfig {
+  bridgeType: 'websocket' | 'socket' | 'file'
+  bridgeConfig: { host: string; port: number }
+  autoConnect: boolean
+  reconnectAttempts: number
+  reconnectDelay: number
+  customSettings: Record<string, unknown>
+}
+
+export interface GameCommand {
+  action: string
+  params: Record<string, unknown>
+  timeout?: number
+}
+
+export interface GameCommandResult {
+  success: boolean
+  data?: unknown
+  error?: string
+  duration: number
+}

@@ -9,7 +9,9 @@ import {
   FolderOpen,
   User,
   Puzzle,
-  Settings
+  Settings,
+  Gamepad2,
+  GitBranch
 } from 'lucide-react'
 
 const navItems = [
@@ -17,10 +19,12 @@ const navItems = [
   { path: '/live', label: 'Live', icon: Radio },
   { path: '/triggers', label: 'Triggers', icon: Zap },
   { path: '/automation', label: 'Automation', icon: Zap },
+  { path: '/graph-editor', label: 'Graph Editor', icon: GitBranch },
   { path: '/overlay', label: 'Overlay Studio', icon: Palette },
   { path: '/obs', label: 'OBS Studio', icon: Monitor },
   { path: '/overlay-runtime', label: 'Overlay Runtime', icon: Layers },
   { path: '/assets', label: 'Assets', icon: FolderOpen },
+  { path: '/games', label: 'Games', icon: Gamepad2 },
   { path: '/profiles', label: 'Profiles', icon: User },
   { path: '/plugins', label: 'Plugins', icon: Puzzle },
   { path: '/settings', label: 'Settings', icon: Settings }

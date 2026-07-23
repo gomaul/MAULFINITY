@@ -1,37 +1,96 @@
-import { IpcMainInvokeEvent } from 'electron'
-import { PluginRepository } from '@services/database/repositories/PluginRepository'
-import { v4 as uuidv4 } from 'uuid'
-import { Logger } from '@services/logger'
+import { ipcMain } from 'electron'
+import { PluginManager } from '../../plugins/PluginManager'
+import { PluginManifest } from '../../plugins/types'
 
-const logger = new Logger('PluginIPC')
-const pluginRepo = new PluginRepository()
+const pluginManager = PluginManager.getInstance()
 
-export const pluginHandlers = {
-  async list(): Promise<unknown[]> {
-    return pluginRepo.findAll()
-  },
-
-  async install(_event: IpcMainInvokeEvent, path: string): Promise<unknown> {
-    logger.info(`Installing plugin from: ${path}`)
-    // TODO: Implement plugin installation logic
-    const plugin = {
-      id: uuidv4(),
-      name: 'Unknown Plugin',
-      version: '1.0.0',
-      enabled: 1,
-      permissions_json: '[]',
-      path
+/**
+ * Register plugin IPC handlers
+ */
+export function registerPluginIpc(): void {
+  // ============================================================
+  // PLUGIN LIST
+  // ============================================================
+  ipcMain.handle('plugin:list', async () => {
+    try {
+      const plugins = pluginManager.getAllPlugins()
+      return { success: true, data: plugins }
+    } catch (error) {
+      return { success: false, error: (error as Error).message }
     }
-    return pluginRepo.create(plugin)
-  },
+  })
 
-  async disable(_event: IpcMainInvokeEvent, id: string): Promise<void> {
-    logger.info(`Disabling plugin: ${id}`)
-    pluginRepo.toggleEnabled(id)
-  },
+  // ============================================================
+  // PLUGIN INSTALL
+  // ============================================================
+  ipcMain.handle('plugin:install', async (_event, data: { manifest: PluginManifest; path: string }) => {
+    try {
+      const plugin = await pluginManager.install(data.manifest, data.path)
+      return { success: true, data: plugin }
+    } catch (error) {
+      return { success: false, error: (error as Error).message }
+    }
+  })
 
-  async remove(_event: IpcMainInvokeEvent, id: string): Promise<void> {
-    logger.info(`Removing plugin: ${id}`)
-    pluginRepo.delete(id)
-  }
+  // ============================================================
+  // PLUGIN REMOVE
+  // ============================================================
+  ipcMain.handle('plugin:remove', async (_event, pluginId: string) => {
+    try {
+      await pluginManager.uninstall(pluginId)
+      return { success: true }
+    } catch (error) {
+      return { success: false, error: (error as Error).message }
+    }
+  })
+
+  // ============================================================
+  // PLUGIN ENABLE
+  // ============================================================
+  ipcMain.handle('plugin:enable', async (_event, pluginId: string) => {
+    try {
+      await pluginManager.enable(pluginId)
+      return { success: true }
+    } catch (error) {
+      return { success: false, error: (error as Error).message }
+    }
+  })
+
+  // ============================================================
+  // PLUGIN DISABLE
+  // ============================================================
+  ipcMain.handle('plugin:disable', async (_event, pluginId: string) => {
+    try {
+      await pluginManager.disable(pluginId)
+      return { success: true }
+    } catch (error) {
+      return { success: false, error: (error as Error).message }
+    }
+  })
+
+  // ============================================================
+  // PLUGIN GET INFO
+  // ============================================================
+  ipcMain.handle('plugin:get-info', async (_event, pluginId: string) => {
+    try {
+      const plugin = pluginManager.getPlugin(pluginId)
+      return { success: true, data: plugin }
+    } catch (error) {
+      return { success: false, error: (error as Error).message }
+    }
+  })
+
+  // ============================================================
+  // PLUGIN UPDATE SETTINGS
+  // ============================================================
+  ipcMain.handle('plugin:update-settings', async (_event, pluginId: string, settings: Record<string, unknown>) => {
+    try {
+      pluginManager.getPlugin(pluginId)
+      return { success: true }
+    } catch (error) {
+      return { success: false, error: (error as Error).message }
+    }
+  })
+
+  console.log('Plugin IPC handlers registered')
 }

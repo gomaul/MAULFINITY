@@ -74,12 +74,15 @@ const maulfinity = {
     getState: () => ipcRenderer.invoke('overlayEditor:getState')
   },
 
-  // Plugin operations
+  // Plugin SDK operations
   plugin: {
     list: () => ipcRenderer.invoke('plugin:list'),
-    install: (path: string) => ipcRenderer.invoke('plugin:install', path),
-    disable: (id: string) => ipcRenderer.invoke('plugin:disable', id),
-    remove: (id: string) => ipcRenderer.invoke('plugin:remove', id)
+    install: (data: unknown) => ipcRenderer.invoke('plugin:install', data),
+    remove: (pluginId: string) => ipcRenderer.invoke('plugin:remove', pluginId),
+    enable: (pluginId: string) => ipcRenderer.invoke('plugin:enable', pluginId),
+    disable: (pluginId: string) => ipcRenderer.invoke('plugin:disable', pluginId),
+    getInfo: (pluginId: string) => ipcRenderer.invoke('plugin:get-info', pluginId),
+    updateSettings: (pluginId: string, settings: unknown) => ipcRenderer.invoke('plugin:update-settings', pluginId, settings)
   },
 
   // System operations
@@ -87,6 +90,42 @@ const maulfinity = {
     getVersion: () => ipcRenderer.invoke('system:getVersion'),
     getStatus: () => ipcRenderer.invoke('system:getStatus'),
     restart: () => ipcRenderer.invoke('system:restart')
+  },
+
+  // Game Integration operations
+  game: {
+    list: () => ipcRenderer.invoke('game:list'),
+    register: (data: unknown) => ipcRenderer.invoke('game:register', data),
+    remove: (gameId: string) => ipcRenderer.invoke('game:remove', gameId),
+    connect: (gameId: string) => ipcRenderer.invoke('game:connect', gameId),
+    disconnect: (gameId: string) => ipcRenderer.invoke('game:disconnect', gameId),
+    getState: (gameId: string) => ipcRenderer.invoke('game:get-state', gameId),
+    sendCommand: (gameId: string, command: unknown) => ipcRenderer.invoke('game:send-command', gameId, command),
+    getAllStatus: () => ipcRenderer.invoke('game:get-all-status'),
+    testEvent: (gameId: string, type: string, eventData: unknown) => ipcRenderer.invoke('game:test-event', { gameId, type, eventData })
+  },
+
+  // Graph Editor operations
+  graph: {
+    list: () => ipcRenderer.invoke('graph:list'),
+    get: (graphId: string) => ipcRenderer.invoke('graph:get', graphId),
+    new: (data: { name: string; description?: string }) => ipcRenderer.invoke('graph:new', data),
+    save: (graph: unknown) => ipcRenderer.invoke('graph:save', graph),
+    delete: (graphId: string) => ipcRenderer.invoke('graph:delete', graphId),
+    toggle: (graphId: string) => ipcRenderer.invoke('graph:toggle', graphId),
+    addNode: (graphId: string, node: unknown) => ipcRenderer.invoke('graph:addNode', graphId, node),
+    updateNode: (graphId: string, nodeId: string, updates: unknown) => ipcRenderer.invoke('graph:updateNode', graphId, nodeId, updates),
+    removeNode: (graphId: string, nodeId: string) => ipcRenderer.invoke('graph:removeNode', graphId, nodeId),
+    addConnection: (graphId: string, connection: unknown) => ipcRenderer.invoke('graph:addConnection', graphId, connection),
+    removeConnection: (graphId: string, connectionId: string) => ipcRenderer.invoke('graph:removeConnection', graphId, connectionId),
+    addVariable: (graphId: string, variable: unknown) => ipcRenderer.invoke('graph:addVariable', graphId, variable),
+    removeVariable: (graphId: string, name: string) => ipcRenderer.invoke('graph:removeVariable', graphId, name),
+    getNodeTypes: () => ipcRenderer.invoke('graph:getNodeTypes'),
+    validate: (graph: unknown) => ipcRenderer.invoke('graph:validate', graph),
+    execute: (graphId: string, eventData: unknown) => ipcRenderer.invoke('graph:execute', graphId, eventData),
+    export: (graphId: string) => ipcRenderer.invoke('graph:export', graphId),
+    import: (data: unknown) => ipcRenderer.invoke('graph:import', data),
+    getStats: () => ipcRenderer.invoke('graph:getStats')
   }
 }
 

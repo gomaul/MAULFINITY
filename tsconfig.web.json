@@ -20,7 +20,8 @@
     "jsx": "react-jsx",
     "paths": {
       "@shared/*": ["./src/shared/*"],
-      "@renderer/*": ["./src/renderer/*"]
+      "@renderer/*": ["./src/renderer/*"],
+      "@game/*": ["./src/game/*"]
     }
   },
   "include": [

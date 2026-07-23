@@ -7,6 +7,7 @@ import { WebsocketAction } from './actions/WebsocketAction'
 import { TtsAction } from './actions/TtsAction'
 import { OverlayAction } from './actions/OverlayAction'
 import { OBSAction } from './actions/OBSAction'
+import { GameCommandAction } from './actions/GameCommandAction'
 
 const logger = new Logger('ActionEngine')
 
@@ -40,7 +41,8 @@ export class ActionEngine {
     this.registry.register('tts', new TtsAction())
     this.registry.register('overlay', new OverlayAction())
     this.registry.register('obs', new OBSAction())
-    logger.info('Action engine initialized with built-in actions: keyboard, sound, websocket, tts, overlay, obs')
+    this.registry.register('game', new GameCommandAction())
+    logger.info('Action engine initialized with built-in actions: keyboard, sound, websocket, tts, overlay, obs, game')
   }
 
   /**

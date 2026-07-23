@@ -11,6 +11,9 @@ import { settingsHandlers } from './settings.ipc'
 import { obsHandlers } from './obs.ipc'
 import { overlayRuntimeHandlers } from './overlay-runtime.ipc'
 import { overlayEditorHandlers } from './overlay-editor.ipc'
+import { registerGameIpc } from './game.ipc'
+import { registerPluginIpc } from './plugin.ipc'
+import { registerGraphIpc } from './graph.ipc'
 
 export function registerIpcHandlers(): void {
   // Profile handlers
@@ -112,4 +115,13 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('overlayRuntime:stopAnimation', overlayRuntimeHandlers.stopAnimation)
   ipcMain.handle('overlayRuntime:startRendering', overlayRuntimeHandlers.startRendering)
   ipcMain.handle('overlayRuntime:stopRendering', overlayRuntimeHandlers.stopRendering)
+
+  // Game Integration handlers
+  registerGameIpc()
+
+  // Plugin SDK handlers
+  registerPluginIpc()
+
+  // Graph Editor handlers
+  registerGraphIpc()
 }

@@ -109,6 +109,66 @@ export interface OverlayObject {
   animation?: { type: string; duration: number; easing?: string }
 }
 
+// Graph Editor Types
+export interface AutomationGraph {
+  id: string
+  name: string
+  description: string
+  version: string
+  author: string
+  tags: string[]
+  nodes: GraphNode[]
+  connections: GraphConnection[]
+  variables: GraphVariable[]
+  settings: GraphSettings
+  enabled: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface GraphNode {
+  id: string
+  type: string
+  position: { x: number; y: number }
+  config: Record<string, unknown>
+  disabled?: boolean
+}
+
+export interface GraphConnection {
+  id: string
+  from: { nodeId: string; portName: string }
+  to: { nodeId: string; portName: string }
+}
+
+export interface GraphVariable {
+  name: string
+  type: 'number' | 'string' | 'boolean'
+  defaultValue: unknown
+  description?: string
+}
+
+export interface GraphSettings {
+  maxExecutionDepth: number
+  maxParallelExecutions: number
+  executionTimeout: number
+  cooldown: number
+}
+
+export interface GraphNodeType {
+  type: string
+  category: string
+  name: string
+  description: string
+  icon: string
+  color: string
+}
+
+export interface ValidationResult {
+  valid: boolean
+  errors: Array<{ type: string; id?: string; message: string }>
+  warnings: Array<{ type: string; id?: string; message: string }>
+}
+
 export interface MaulfinityAPI {
   profile: {
     list: () => Promise<Profile[]>
@@ -184,15 +244,50 @@ export interface MaulfinityAPI {
     stopRendering: () => Promise<void>
   }
   plugin: {
-    list: () => Promise<Plugin[]>
-    install: (path: string) => Promise<Plugin>
-    disable: (id: string) => Promise<void>
-    remove: (id: string) => Promise<void>
+    list: () => Promise<{ success: boolean; data: Array<{ manifest: { id: string; name: string; version: string; description: string; author: string; type: string; permissions: string[] }; state: string; config: Record<string, unknown>; grantedPermissions: string[]; error?: string; installedAt: string; lastEnabledAt?: string }> }>
+    install: (data: { manifest: Record<string, unknown>; path: string }) => Promise<{ success: boolean; data?: unknown; error?: string }>
+    remove: (pluginId: string) => Promise<{ success: boolean; error?: string }>
+    enable: (pluginId: string) => Promise<{ success: boolean; error?: string }>
+    disable: (pluginId: string) => Promise<{ success: boolean; error?: string }>
+    getInfo: (pluginId: string) => Promise<{ success: boolean; data?: unknown; error?: string }>
+    updateSettings: (pluginId: string, settings: Record<string, unknown>) => Promise<{ success: boolean; error?: string }>
   }
   system: {
     getVersion: () => Promise<string>
     getStatus: () => Promise<{ connected: boolean; platform: string | null }>
     restart: () => Promise<void>
+  }
+  game: {
+    list: () => Promise<{ success: boolean; data: Array<{ id: string; name: string; adapter: string; status: string; enabled: number }> }>
+    register: (data: { id: string; name: string; adapter: string; version?: string; description?: string; config?: Record<string, unknown> }) => Promise<{ success: boolean; data?: unknown; error?: string }>
+    remove: (gameId: string) => Promise<{ success: boolean; error?: string }>
+    connect: (gameId: string) => Promise<{ success: boolean; error?: string }>
+    disconnect: (gameId: string) => Promise<{ success: boolean; error?: string }>
+    getState: (gameId: string) => Promise<{ success: boolean; data?: { adapterState: string | null; gameState: unknown } }>
+    sendCommand: (gameId: string, command: { action: string; params: Record<string, unknown> }) => Promise<{ success: boolean; data?: { success: boolean; data?: unknown; error?: string; duration: number } }>
+    getAllStatus: () => Promise<{ success: boolean; data: Array<{ game: { id: string; name: string; adapter: string; status: string }; connected: boolean; state: string | null; stats: unknown }> }>
+    testEvent: (gameId: string, type: string, eventData: Record<string, unknown>) => Promise<{ success: boolean; data?: unknown }>
+  }
+  graph: {
+    list: () => Promise<{ success: boolean; data: AutomationGraph[] }>
+    get: (graphId: string) => Promise<{ success: boolean; data?: AutomationGraph; error?: string }>
+    new: (data: { name: string; description?: string }) => Promise<{ success: boolean; data?: AutomationGraph; error?: string }>
+    save: (graph: AutomationGraph) => Promise<{ success: boolean; data?: AutomationGraph; error?: string }>
+    delete: (graphId: string) => Promise<{ success: boolean; error?: string }>
+    toggle: (graphId: string) => Promise<{ success: boolean; data?: AutomationGraph; error?: string }>
+    addNode: (graphId: string, node: GraphNode) => Promise<{ success: boolean; data?: GraphNode; error?: string }>
+    updateNode: (graphId: string, nodeId: string, updates: Partial<GraphNode>) => Promise<{ success: boolean; data?: GraphNode; error?: string }>
+    removeNode: (graphId: string, nodeId: string) => Promise<{ success: boolean; data?: boolean; error?: string }>
+    addConnection: (graphId: string, connection: GraphConnection) => Promise<{ success: boolean; data?: GraphConnection; error?: string }>
+    removeConnection: (graphId: string, connectionId: string) => Promise<{ success: boolean; data?: boolean; error?: string }>
+    addVariable: (graphId: string, variable: GraphVariable) => Promise<{ success: boolean; error?: string }>
+    removeVariable: (graphId: string, name: string) => Promise<{ success: boolean; data?: boolean; error?: string }>
+    getNodeTypes: () => Promise<{ success: boolean; data?: Array<{ category: string; nodes: GraphNodeType[] }>; error?: string }>
+    validate: (graph: AutomationGraph) => Promise<{ success: boolean; data?: ValidationResult; error?: string }>
+    execute: (graphId: string, eventData: Record<string, unknown>) => Promise<{ success: boolean; data?: unknown; error?: string }>
+    export: (graphId: string) => Promise<{ success: boolean; data?: unknown; error?: string }>
+    import: (data: unknown) => Promise<{ success: boolean; data?: AutomationGraph; error?: string }>
+    getStats: () => Promise<{ success: boolean; data?: { total: number; enabled: number; totalNodes: number; totalConnections: number }; error?: string }>
   }
 }
 

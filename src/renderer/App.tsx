@@ -11,6 +11,8 @@ import Profiles from './pages/Profiles'
 import Plugins from './pages/Plugins'
 import Settings from './pages/Settings'
 import Live from './pages/Live'
+import Games from './pages/Games'
+import GraphEditor from './pages/GraphEditor'
 
 function App() {
   return (
@@ -19,6 +21,7 @@ function App() {
         <Route path="live" element={<Live />} />
         <Route path="triggers" element={<Triggers />} />
         <Route path="automation" element={<Automation />} />
+        <Route path="graph-editor" element={<GraphEditor />} />
         <Route path="overlay" element={<OverlayStudio />} />
         <Route path="obs" element={<OBS />} />
         <Route path="overlay-runtime" element={<OverlayRuntimePage />} />
