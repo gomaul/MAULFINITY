@@ -10,6 +10,7 @@ import { systemHandlers } from './system.ipc'
 import { settingsHandlers } from './settings.ipc'
 import { obsHandlers } from './obs.ipc'
 import { overlayRuntimeHandlers } from './overlay-runtime.ipc'
+import { overlayEditorHandlers } from './overlay-editor.ipc'
 
 export function registerIpcHandlers(): void {
   // Profile handlers
@@ -89,6 +90,17 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('obs:stopStreaming', obsHandlers.stopStreaming)
   ipcMain.handle('obs:toggleStreaming', obsHandlers.toggleStreaming)
   ipcMain.handle('obs:getStats', obsHandlers.getStats)
+
+  // Overlay Editor handlers
+  ipcMain.handle('overlayEditor:new', overlayEditorHandlers.newScene)
+  ipcMain.handle('overlayEditor:save', overlayEditorHandlers.save)
+  ipcMain.handle('overlayEditor:load', overlayEditorHandlers.load)
+  ipcMain.handle('overlayEditor:export', overlayEditorHandlers.exportScene)
+  ipcMain.handle('overlayEditor:import', overlayEditorHandlers.importScene)
+  ipcMain.handle('overlayEditor:undo', overlayEditorHandlers.undo)
+  ipcMain.handle('overlayEditor:redo', overlayEditorHandlers.redo)
+  ipcMain.handle('overlayEditor:addToHistory', overlayEditorHandlers.addToHistory)
+  ipcMain.handle('overlayEditor:getState', overlayEditorHandlers.getState)
 
   // Overlay Runtime handlers
   ipcMain.handle('overlayRuntime:getCurrentScene', overlayRuntimeHandlers.getCurrentScene)

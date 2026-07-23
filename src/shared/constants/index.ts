@@ -39,6 +39,17 @@ export const IPC_CHANNELS = {
   OVERLAY_SAVE: 'overlay:save',
   OVERLAY_PREVIEW: 'overlay:preview',
 
+  // Overlay Editor
+  OVERLAY_EDITOR_NEW: 'overlayEditor:new',
+  OVERLAY_EDITOR_SAVE: 'overlayEditor:save',
+  OVERLAY_EDITOR_LOAD: 'overlayEditor:load',
+  OVERLAY_EDITOR_EXPORT: 'overlayEditor:export',
+  OVERLAY_EDITOR_IMPORT: 'overlayEditor:import',
+  OVERLAY_EDITOR_UNDO: 'overlayEditor:undo',
+  OVERLAY_EDITOR_REDO: 'overlayEditor:redo',
+  OVERLAY_EDITOR_ADD_HISTORY: 'overlayEditor:addToHistory',
+  OVERLAY_EDITOR_GET_STATE: 'overlayEditor:getState',
+
   // Plugin
   PLUGIN_LIST: 'plugin:list',
   PLUGIN_INSTALL: 'plugin:install',

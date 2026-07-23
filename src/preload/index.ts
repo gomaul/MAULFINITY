@@ -61,6 +61,19 @@ const maulfinity = {
     preview: (id: string) => ipcRenderer.invoke('overlay:preview', id)
   },
 
+  // Overlay Editor operations
+  overlayEditor: {
+    newScene: (data: { name: string; width: number; height: number }) => ipcRenderer.invoke('overlayEditor:new', data),
+    save: (data: { id: string; scene: unknown }) => ipcRenderer.invoke('overlayEditor:save', data),
+    load: (id: string) => ipcRenderer.invoke('overlayEditor:load', id),
+    exportScene: (data: { scene: unknown; defaultName?: string }) => ipcRenderer.invoke('overlayEditor:export', data),
+    importScene: () => ipcRenderer.invoke('overlayEditor:import'),
+    undo: () => ipcRenderer.invoke('overlayEditor:undo'),
+    redo: () => ipcRenderer.invoke('overlayEditor:redo'),
+    addToHistory: (scene: unknown) => ipcRenderer.invoke('overlayEditor:addToHistory', scene),
+    getState: () => ipcRenderer.invoke('overlayEditor:getState')
+  },
+
   // Plugin operations
   plugin: {
     list: () => ipcRenderer.invoke('plugin:list'),
