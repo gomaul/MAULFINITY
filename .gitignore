@@ -1,0 +1,29 @@
+node_modules/
+dist/
+out/
+.env
+.env.local
+*.db
+*.log
+.DS_Store
+Thumbs.db
+coverage/
+.cache/
+*.tsbuildinfo
+
+# Database
+database/*.db
+
+# Logs
+logs/*.log
+
+# Plugins (user-installed)
+plugins/*/
+!plugins/.gitkeep
+
+# Profiles (user data)
+profiles/*
+!profiles/.gitkeep
+
+# Build output
+release/
