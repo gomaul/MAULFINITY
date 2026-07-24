@@ -5,13 +5,13 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
-    include: ['src/**/*.test.ts'],
+    include: ['src/**/*.test.ts', 'tests/**/*.test.ts'],
     exclude: ['src/renderer/**', 'src/preload/**'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
       include: ['src/core/**/*.ts', 'src/services/**/*.ts'],
-      exclude: ['src/**/*.test.ts', 'src/renderer/**', 'src/preload/**']
+      exclude: ['src/**/*.test.ts', 'tests/**/*.test.ts', 'src/renderer/**', 'src/preload/**']
     }
   },
   resolve: {

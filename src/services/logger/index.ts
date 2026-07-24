@@ -14,6 +14,10 @@ export class Logger {
     return `[${timestamp}] [${LOG_LEVELS[level]}] [${this.module}] ${message}`
   }
 
+  debug(message: string, ...args: unknown[]): void {
+    console.debug(this.formatMessage('DEBUG', message), ...args)
+  }
+
   info(message: string): void {
     console.log(this.formatMessage('INFO', message))
   }

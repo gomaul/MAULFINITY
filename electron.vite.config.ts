@@ -14,6 +14,7 @@ export default defineConfig({
         '@connectors': resolve('src/connectors'),
         '@game': resolve('src/game'),
         '@plugins': resolve('src/plugins'),
+        '@overlay': resolve('src/overlay'),
         '@automation': resolve('src/automation')
       }
     }

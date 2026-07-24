@@ -159,7 +159,7 @@ class ActionAPIImpl implements ActionAPI {
   }
 
   private checkPermission(permission: string): void {
-    if (!this.plugin.grantedPermissions.includes(permission as any)) {
+    if (!this.plugin.grantedPermissions.includes(permission as PluginPermission)) {
       throw new Error(`Permission denied: ${permission}`)
     }
   }

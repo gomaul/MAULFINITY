@@ -5,7 +5,6 @@ import { automationHandlers } from './automation.ipc'
 import { assetHandlers } from './asset.ipc'
 import { connectorHandlers } from './connector.ipc'
 import { overlayHandlers } from './overlay.ipc'
-import { pluginHandlers } from './plugin.ipc'
 import { systemHandlers } from './system.ipc'
 import { settingsHandlers } from './settings.ipc'
 import { obsHandlers } from './obs.ipc'
@@ -61,12 +60,6 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('overlay:list', overlayHandlers.list)
   ipcMain.handle('overlay:save', overlayHandlers.save)
   ipcMain.handle('overlay:preview', overlayHandlers.preview)
-
-  // Plugin handlers
-  ipcMain.handle('plugin:list', pluginHandlers.list)
-  ipcMain.handle('plugin:install', pluginHandlers.install)
-  ipcMain.handle('plugin:disable', pluginHandlers.disable)
-  ipcMain.handle('plugin:remove', pluginHandlers.remove)
 
   // System handlers
   ipcMain.handle('system:getVersion', systemHandlers.getVersion)
