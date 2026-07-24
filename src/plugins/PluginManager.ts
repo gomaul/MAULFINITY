@@ -11,7 +11,8 @@ import {
   PluginState,
   PluginPermission,
   PluginActivator,
-  PluginDeactivator
+  PluginDeactivator,
+  EventCallback
 } from './types'
 
 const logger = new Logger('PluginManager')
@@ -366,18 +367,18 @@ export class PluginManager extends EventEmitter {
         getConfig: () => ({ ...plugin.config })
       },
       events: {
-        on: (eventType, callback) => {
-          return this.eventBus.on(eventType, callback as any, pluginId)
+        on: (eventType: string, callback: EventCallback) => {
+          return this.eventBus.on(eventType, (event) => callback(event), pluginId)
         },
-        once: (eventType, callback) => {
-          return this.eventBus.once(eventType, callback as any, pluginId)
+        once: (eventType: string, callback: EventCallback) => {
+          return this.eventBus.once(eventType, (event) => callback(event), pluginId)
         },
         emit: async (event) => {
           await this.eventBus.emit({
             id: `plugin_${Date.now()}`,
             timestamp: Date.now(),
             ...event
-          } as any)
+          } as import('@shared/types').MaulfinityEvent)
         },
         getHistory: (limit) => this.eventBus.getHistory(limit)
       },

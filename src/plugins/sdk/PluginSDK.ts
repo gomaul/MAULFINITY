@@ -20,7 +20,8 @@ import {
   GameAdapterDefinition,
   WidgetDefinition,
   MenuItem,
-  Notification
+  Notification,
+  PluginPermission
 } from '../types'
 import { PluginStorage } from '../PluginStorage'
 import { PluginPermissionManager } from '../PluginPermissionManager'
@@ -86,12 +87,12 @@ class EventAPIImpl implements EventAPI {
 
   on(eventType: string, callback: EventCallback): () => void {
     this.checkPermission('events.read')
-    return this.eventBus.on(eventType, callback as any, this.plugin.manifest.id)
+    return this.eventBus.on(eventType, (event) => callback(event), this.plugin.manifest.id)
   }
 
   once(eventType: string, callback: EventCallback): () => void {
     this.checkPermission('events.read')
-    return this.eventBus.once(eventType, callback as any, this.plugin.manifest.id)
+    return this.eventBus.once(eventType, (event) => callback(event), this.plugin.manifest.id)
   }
 
   async emit(event: Omit<MaulfinityEvent, 'id' | 'timestamp'>): Promise<void> {
@@ -109,7 +110,7 @@ class EventAPIImpl implements EventAPI {
   }
 
   private checkPermission(permission: string): void {
-    if (!this.plugin.grantedPermissions.includes(permission as any)) {
+    if (!this.plugin.grantedPermissions.includes(permission as PluginPermission)) {
       throw new Error(`Permission denied: ${permission}`)
     }
   }
@@ -190,7 +191,7 @@ class GraphAPIImpl implements GraphAPI {
   }
 
   private checkPermission(permission: string): void {
-    if (!this.plugin.grantedPermissions.includes(permission as any)) {
+    if (!this.plugin.grantedPermissions.includes(permission as PluginPermission)) {
       throw new Error(`Permission denied: ${permission}`)
     }
   }
@@ -220,7 +221,7 @@ class ConnectorAPIImpl implements ConnectorAPI {
   }
 
   private checkPermission(permission: string): void {
-    if (!this.plugin.grantedPermissions.includes(permission as any)) {
+    if (!this.plugin.grantedPermissions.includes(permission as PluginPermission)) {
       throw new Error(`Permission denied: ${permission}`)
     }
   }
@@ -246,7 +247,7 @@ class GameAPIImpl implements GameAPI {
   }
 
   private checkPermission(permission: string): void {
-    if (!this.plugin.grantedPermissions.includes(permission as any)) {
+    if (!this.plugin.grantedPermissions.includes(permission as PluginPermission)) {
       throw new Error(`Permission denied: ${permission}`)
     }
   }
@@ -278,7 +279,7 @@ class OverlayAPIImpl implements OverlayAPI {
   }
 
   private checkPermission(permission: string): void {
-    if (!this.plugin.grantedPermissions.includes(permission as any)) {
+    if (!this.plugin.grantedPermissions.includes(permission as PluginPermission)) {
       throw new Error(`Permission denied: ${permission}`)
     }
   }
@@ -342,7 +343,7 @@ class UIAPIImpl implements UIAPI {
   }
 
   private checkPermission(permission: string): void {
-    if (!this.plugin.grantedPermissions.includes(permission as any)) {
+    if (!this.plugin.grantedPermissions.includes(permission as PluginPermission)) {
       throw new Error(`Permission denied: ${permission}`)
     }
   }
